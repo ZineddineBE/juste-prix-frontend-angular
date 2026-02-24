@@ -1,0 +1,68 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="display-5 fw-bold text-primary m-0">
+      <i class="fa fa-gamepad me-2"></i>Sessions de Jeu
+    </h1>
+    
+    @if (authentification.isAdmin()) {
+      <button routerLink="/create-session" mat-fab extended color="primary">
+        <mat-icon class="me-2">add</mat-icon>
+        Créer une session
+      </button>
+    }
+  </div>
+
+  <hr class="mb-5">
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    @for (session of sessionService.sessions(); track $index) {
+      <div class="col">
+        <mat-card class="session-card h-100 shadow-sm border-0">
+          <mat-card-header class="pb-3">
+            <div mat-card-avatar class="user-avatar">
+              <i class="fa fa-user-circle fa-2x text-secondary"></i>
+            </div>
+            <mat-card-title class="fw-bold d-flex justify-content-between align-items-center w-100">
+              <span>{{ session.nom }}</span>
+              
+              @if (getMyScore(session) !== null) {
+                <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle fs-6 fw-normal mx-2">
+                  {{ getMyScore(session) }} pts
+                </span>
+              }
+            </mat-card-title>
+            <mat-card-subtitle>Créé par : {{ session.createur }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-actions class="justify-content-end p-3">
+            @switch (getGameStatus(session)) {
+              @case ('FINISHED') {
+                <button mat-flat-button color="primary" [routerLink]="['/game', session.nom]">
+                  <i class="fa fa-trophy me-2"></i>Voir le classement
+                </button>
+              }
+              @case ('CONTINUE') {
+                <button mat-flat-button color="accent" [routerLink]="['/game', session.nom]">
+                  <i class="fa fa-forward me-2"></i>Continuer
+                </button>
+              }
+              @default {
+                <button mat-stroked-button color="accent" [routerLink]="['/game', session.nom]">
+                  <i class="fa fa-play me-2"></i>Rejoindre
+                </button>
+              }
+            }
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    }
+  </div>
+
+  @if (sessionService.sessions().length === 0) {
+    <div class="d-flex flex-column align-items-center mt-3" style="min-height: 50vh;">
+      <i class="fa fa-search fa-4x text-light mb-3"></i>
+      <p class="text-muted h4 fw-light">Aucune session active pour le moment.</p>
+      <p class="small text-secondary">Revenez plus tard ou demandez à un admin d'en créer une !</p>
+    </div>
+  }
+</div>
